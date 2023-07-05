@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="canvas1"></canvas>
+    <div id="app"></div>
+    <script src="react/react.js"></script>
+    <script src="react/react-dom.js"></script>
+    <script src="react/babel.js"></script>
+    <script type="text/babel">
+      class AnimationComponent extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.spritesWidth = 575;
+          this.spritesHeight = 523;
+          this.playerImage = new Image();
+          this.playerImage.src = "./shadow_dog.png";
+          
+          this.spriteAnimations = [];
+          this.animationStates = [
+            {
+              name: "idle",
+              frames: 7,
+            },
+            {
+              name: "jump",
+              frames: 7,
+            },
+            {
+              name: "fall",
+              frames: 7,
+            },
+            {
+              name: "run",
+              frames: 9,
+            },
+            {
+              name: "dizzy",
+              frames: 11,
+            },
+            {
+              name: "sit",
+              frames: 5,
+            },
+            {
+              name: "roll",
+              frames: 7,
+            },
+            {
+              name: "bite",
+              frames: 7,
+            },
+            {
+              name: "ko",
+              frames: 12,
+            },
+            {
+              name: "getHit",
+              frames: 4,
+            },
+          ];
+
+          this.animationStates.forEach((state, index) => {
+            let frames = {
+              loc: [],
+            };
+            for (let j = 0; j < state.frames; j++) {
+              let positionX = j * this.spritesWidth;
+              let positionY = index * this.spritesHeight;
+              frames.loc.push({ x: positionX, y: positionY });
+            }
+            this.spriteAnimations[state.name] = frames;
+          });
+
+          this.onChange = this.onOptionChange.bind(this);
+        }
+
+        onOptionChange = (event) => {
+          const canvas = document.getElementById("canvas1");
+          const ctx = document.getElementById("canvas1").getContext("2d");
+          const canvasWidth = (canvas.width = 600);
+          const canvasHeight = (canvas.height = 600);
+          let gameFrame = 0;
+          let stagger = 5;
+          let position =
+            Math.floor(gameFrame / stagger) %
+            this.spriteAnimations[event.target.value].loc.length;
+          let frameX = this.spritesWidth * position;
+          let frameY =
+            this.spriteAnimations[event.target.value].loc[position].y;
+
+          ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+          ctx.drawImage(
+            this.playerImage,
+            frameX,
+            frameY,
+            this.spritesWidth,
+            this.spritesHeight,
+            0,
+            0,
+            this.spritesWidth,
+            this.spritesHeight
+          );
+          ctx.beginPath();
+          ctx.rect(0, 0, 600, 600);
+          ctx.stroke();
+
+          gameFrame++;
+          // requestAnimationFrame(this.onOptionChange);
+        };
+
+        render() {
+          return (
+            <div>
+              <div className="controls">
+                <label htmlFor="animations">Choose Animations:</label>
+                <select
+                  name="animations"
+                  id="animations"
+                  onChange={this.onOptionChange}
+                >
+                  <option value="idle">Idle</option>
+                  <option value="jump">Jump</option>
+                  <option value="fall">Fall</option>
+                  <option value="run">Run</option>
+                  <option value="dizzy">Dizzy</option>
+                  <option value="sit">Sit</option>
+                  <option value="roll">Roll</option>
+                  <option value="bite">Bite</option>
+                  <option value="ko">KO</option>
+                  <option value="getHit">Get Hit</option>
+                </select>
+              </div>
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(<AnimationComponent />, document.getElementById("app"));
+    </script>
+  </body>
+</html>
